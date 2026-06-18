@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prospector AI - ICP Analysis Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-indigo: #4B0082;
+            --violet-accent: #8A2BE2;
+            --light-gray: #F0F0F0;
+            --dark-gray: #333333;
+            --medium-gray: #777777;
+            --white: #FFFFFF;
+            --success-green: #28a745;
+            --warning-orange: #ffc107;
+            --error-red: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-indigo), var(--violet-accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-indigo);
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: var(--medium-gray);
+            font-weight: 500;
+        }
+        
+        .url-input-section {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-indigo);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--violet-accent);
+        }
+        
+        .url-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .url-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: var(--violet-accent);
+        }
+        
+        .analyze-btn {
+            background-color: var(--violet-accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .analyze-btn:hover {
+            background-color: var(--primary-indigo);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.2);
+        }
+        
+        .pages-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .page-tag {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--violet-accent);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .results-section {
+            display: none;
+            margin-bottom: 40px;
+        }
+        
+        .company-summary {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .company-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .company-logo {
+            width: 70px;
+            height: 70px;
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-indigo);
+            font-size: 30px;
+        }
+        
+        .company-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-indigo);
+            margin-bottom: 5px;
+        }
+        
+        .company-info p {
+            color: var(--medium-gray);
+        }
+        
+        .overall-score {
+            margin-left: auto;
+            text-align: center;
+        }
+        
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(var(--violet-accent) 0% 75%, var(--light-gray) 75% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        
+        .score-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--white);
+        }
+        
+        .score-label {
+            font-size: 14px;
+            color: var(--medium-gray);
+            font-weight: 500;
+        }
+        
+        .category-scores {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .category-score {
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .category-score:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            color: var(--primary-indigo);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-value {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--violet-accent);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--violet-accent);
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
+        
+        .signals-section {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .signals-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .signal-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .signal-card:hover {
+            border-color: var(--violet-accent);
+            transform: translateY(-3px);
+        }
+        
+        .signal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .signal-category {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--violet-accent);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .signal-impact {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--medium-gray);
+        }
+        
+        .signal-text {
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .signal-positive {
+            border-left: 4px solid var(--success-green);
+        }
+        
+        .signal-negative {
+            border-left: 4px solid var(--error-red);
+        }
+        
+        .signal-neutral {
+            border-left: 4px solid var(--warning-orange);
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(138, 43, 226, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--violet-accent);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            display: none;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--error-red);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid var(--error-red);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: var(--medium-gray);
+            font-size: 14px;
+            border-top: 1px solid #ddd;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .url-form {
+                flex-direction: column;
+            }
+            
+            .company-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .overall-score {
+                margin-left: 0;
+                margin-top: 20px;
+            }
+            
+            .category-scores {
+                grid-template-columns: 1fr;
+            }
+            
+            .signals-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <div>
+                    <div class="logo-text">Prospector AI</div>
+                    <div class="tagline">Intelligent ICP Analysis & Signal Extraction</div>
+                </div>
+            </div>
+        </header>
+        
+        <section class="url-input-section">
+            <h2 class="section-title">
+                <i class="fas fa-search"></i> Analyze Company Website
+            </h2>
+            <p>Enter a company homepage URL to extract ICP signals and calculate alignment score.</p>
+            
+            <form class="url-form" id="analysisForm">
+                <input type="url" class="url-input" id="companyUrl" placeholder="https://example.com" required>
+                <button type="submit" class="analyze-btn" id="analyzeBtn">
+                    <i class="fas fa-chart-line"></i> Analyze ICP Alignment
+                </button>
+            </form>
+            
+            <div class="pages-list">
+                <div class="page-tag">
+                    <i class="fas fa-home"></i> Homepage
+                </div>
+                <div class="page-tag">
+                    <i class="fas fa-info-circle"></i> About
+                </div>
+                <div class="page-tag">
+                    <i class="fas fa-users"></i> Team
+                </div>
+                <div class="page-tag">
+                    <i class="fas fa-blog"></i> Blog
+                </div>
+                <div class="page-tag">
+                    <i class="fas fa-briefcase"></i> Careers
+                </div>
+                <div class="page-tag">
+                    <i class="fas fa-cube"></i> Products
+                </div>
+            </div>
+            
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Analyzing website content and extracting ICP signals...</p>
+                <p class="tagline">This may take up to 30 seconds</p>
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-triangle"></i> <span id="errorText">There was an error analyzing the website. Please check the URL and try again.</span>
+            </div>
+        </section>
+        
+        <section class="results-section" id="resultsSection">
+            <div class="company-summary">
+                <div class="company-header">
+                    <div class="company-logo" id="companyLogo">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="company-info">
+                        <h3 id="companyName">Company Name</h3>
+                        <p id="companyDescription">Company description extracted from website.</p>
+                    </div>
+                    <div class="overall-score">
+                        <div class="score-circle">
+                            <span class="score-value" id="overallScore">0</span>
+                        </div>
+                        <div class="score-label">Overall ICP Score</div>
+                    </div>
+                </div>
+                
+                <div class="category-scores">
+                    <div class="category-score">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-eye"></i> Vision
+                            </div>
+                            <div class="category-value" id="visionScore">0</div>
+                        </div>
+                        <p>Strategic direction and future goals</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="visionProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-score">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-star"></i> Differentiation
+                            </div>
+                            <div class="category-value" id="differentiationScore">0</div>
+                        </div>
+                        <p>Unique value proposition and market position</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="differentiationProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-score">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-heart"></i> Culture
+                            </div>
+                            <div class="category-value" id="cultureScore">0</div>
+                        </div>
+                        <p>Company values and team dynamics</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="cultureProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-score">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-cogs"></i> Process
+                            </div>
+                            <div class="category-value" id="processScore">0</div>
+                        </div>
+                        <p>Operational efficiency and methodologies</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="processProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="category-score">
+                        <div class="category-header">
+                            <div class="category-name">
+                                <i class="fas fa-lightbulb"></i> Innovation
+                            </div>
+                            <div class="category-value" id="innovationScore">0</div>
+                        </div>
+                        <p>R&D focus and technological advancement</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="innovationProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="signals-section">
+                <h2 class="section-title">
+                    <i class="fas fa-bullseye"></i> Extracted ICP Signals
+                </h2>
+                <p>Key signals found during analysis with impact on overall ICP score</p>
+                
+                <div class="signals-container" id="signalsContainer">
+                    <!-- Signals will be dynamically added here -->
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Prospector AI &copy; 2023 | ICP Analysis Tool for DT</p>
+        </footer>
+    </div>
+    
+    <script>
+        // API Configuration
+        const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE'; // Replace with your actual API key
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+        
+        // DOM Elements
+        const analysisForm = document.getElementById('analysisForm');
+        const companyUrlInput = document.getElementById('companyUrl');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loader = document.getElementById('loader');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const resultsSection = document.getElementById('resultsSection');
+        
+        // Results elements
+        const companyName = document.getElementById('companyName');
+        const companyDescription = document.getElementById('companyDescription');
+        const companyLogo = document.getElementById('companyLogo');
+        const overallScore = document.getElementById('overallScore');
+        
+        // Category score elements
+        const visionScore = document.getElementById('visionScore');
+        const differentiationScore = document.getElementById('differentiationScore');
+        const cultureScore = document.getElementById('cultureScore');
+        const processScore = document.getElementById('processScore');
+        const innovationScore = document.getElementById('innovationScore');
+        
+        // Progress bars
+        const visionProgress = document.getElementById('visionProgress');
+        const differentiationProgress = document.getElementById('differentiationProgress');
+        const cultureProgress = document.getElementById('cultureProgress');
+        const processProgress = document.getElementById('processProgress');
+        const innovationProgress = document.getElementById('innovationProgress');
+        
+        // Signals container
+        const signalsContainer = document.getElementById('signalsContainer');
+        
+        // Sample data for demonstration (when API is not available)
+        const sampleCompanies = {
+            'techcorp.com': {
+                name: 'TechCorp Innovations',
+                description: 'Enterprise SaaS solutions for digital transformation',
+                scores: {
+                    overall: 82,
+                    vision: 85,
+                    differentiation: 90,
+                    culture: 75,
+                    process: 80,
+                    innovation: 88
+                },
+                signals: [
+                    {category: 'Vision', impact: 'High', text: 'Clear strategic focus on digital transformation for enterprise clients', type: 'positive'},
+                    {category: 'Differentiation', impact: 'High', text: 'Proprietary AI algorithms mentioned as key competitive advantage', type: 'positive'},
+                    {category: 'Culture', impact: 'Medium', text: 'Emphasis on remote work and flexible schedules aligns with modern work culture', type: 'positive'},
+                    {category: 'Process', impact: 'Medium', text: 'Agile development methodology mentioned in careers page', type: 'positive'},
+                    {category: 'Innovation', impact: 'High', text: 'Dedicated R&D department with 20% of revenue reinvested', type: 'positive'},
+                    {category: 'Culture', impact: 'Low', text: 'Limited diversity indicators in team page photos', type: 'negative'},
+                    {category: 'Vision', impact: 'Medium', text: 'Mission statement is generic and lacks specific market focus', type: 'neutral'}
+                ]
+            },
+            'startupx.com': {
+                name: 'StartupX',
+                description: 'B2C mobile app for personal finance management',
+                scores: {
+                    overall: 65,
+                    vision: 70,
+                    differentiation: 60,
+                    culture: 75,
+                    process: 55,
+                    innovation: 72
+                },
+                signals: [
+                    {category: 'Vision', impact: 'Medium', text: 'Focus on democratizing financial tools for millennials', type: 'positive'},
+                    {category: 'Differentiation', impact: 'Low', text: 'No clear unique selling proposition compared to competitors', type: 'negative'},
+                    {category: 'Culture', impact: 'High', text: 'Strong emphasis on work-life balance and employee wellness programs', type: 'positive'},
+                    {category: 'Process', impact: 'Low', text: 'No mention of development methodology or quality assurance processes', type: 'negative'},
+                    {category: 'Innovation', impact: 'Medium', text: 'Using machine learning for personalized recommendations', type: 'positive'},
+                    {category: 'Vision', impact: 'Medium', text: 'Expansion plans unclear beyond current market', type: 'neutral'}
+                ]
+            },
+            'legacyinc.com': {
+                name: 'Legacy Inc.',
+                description: 'Traditional manufacturing company established in 1985',
+                scores: {
+                    overall: 42,
+                    vision: 40,
+                    differentiation: 35,
+                    culture: 50,
+                    process: 45,
+                    innovation: 38
+                },
+                signals: [
+                    {category: 'Vision', impact: 'Low', text: 'No clear digital transformation strategy mentioned', type: 'negative'},
+                    {category: 'Differentiation', impact: 'Low', text: 'Competing primarily on price rather than innovation', type: 'negative'},
+                    {category: 'Culture', impact: 'Medium', text: 'Hierarchical structure emphasized in organizational chart', type: 'negative'},
+                    {category: 'Process', impact: 'Medium', text: 'Traditional waterfall methodology mentioned', type: 'neutral'},
+                    {category: 'Innovation', impact: 'Low', text: 'No R&D department or innovation initiatives mentioned', type: 'negative'},
+                    {category: 'Process', impact: 'High', text: 'ISO 9001 certification indicates quality focus', type: 'positive'}
+                ]
+            }
+        };
+        
+        // Event Listeners
+        analysisForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const url = companyUrlInput.value.trim();
+            if (!url) return;
+            
+            // Show loader, hide results and error
+            loader.style.display = 'block';
+            resultsSection.style.display = 'none';
+            errorMessage.style.display = 'none';
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            
+            try {
+                // For demo purposes, we'll simulate API call with sample data
+                // In a real implementation, you would call the Gemini API here
+                await simulateAnalysis(url);
+            } catch (error) {
+                showError('Failed to analyze website. Please try again.');
+            } finally {
+                loader.style.display = 'none';
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-chart-line"></i> Analyze ICP Alignment';
+            }
+        });
+        
+        // Simulate analysis (replace with actual API call)
+        async function simulateAnalysis(url) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Extract domain from URL
+            const domain = extractDomain(url);
+            
+            // Check if we have sample data for this domain
+            let companyData;
+            
+            if (sampleCompanies[domain]) {
+                companyData = sampleCompanies[domain];
+            } else {
+                // Default sample data for unknown domains
+                companyData = sampleCompanies['techcorp.com'];
+                companyData.name = `Company from ${domain}`;
+                companyData.description = `Website analyzed: ${domain}`;
+            }
+            
+            // Display results
+            displayResults(companyData);
+        }
+        
+        // Extract domain from URL
+        function extractDomain(url) {
+            try {
+                const urlObj = new URL(url);
+                return urlObj.hostname.replace('www.', '');
+            } catch (e) {
+                // If URL parsing fails, try to extract domain manually
+                const match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n]+)/im);
+                return match ? match[1] : 'example.com';
+            }
+        }
+        
+        // Display analysis results
+        function displayResults(companyData) {
+            // Update company info
+            companyName.textContent = companyData.name;
+            companyDescription.textContent = companyData.description;
+            companyLogo.innerHTML = `<i class="fas fa-${getRandomIcon()}"></i>`;
+            
+            // Update overall score with animation
+            animateValue(overallScore, 0, companyData.scores.overall, 1000);
+            
+            // Update category scores with animation
+            animateValue(visionScore, 0, companyData.scores.vision, 1000);
+            animateValue(differentiationScore, 0, companyData.scores.differentiation, 1000);
+            animateValue(cultureScore, 0, companyData.scores.culture, 1000);
+            animateValue(processScore, 0, companyData.scores.process, 1000);
+            animateValue(innovationScore, 0, companyData.scores.innovation, 1000);
+            
+            // Animate progress bars
+            setTimeout(() => {
+                visionProgress.style.width = `${companyData.scores.vision}%`;
+                differentiationProgress.style.width = `${companyData.scores.differentiation}%`;
+                cultureProgress.style.width = `${companyData.scores.culture}%`;
+                processProgress.style.width = `${companyData.scores.process}%`;
+                innovationProgress.style.width = `${companyData.scores.innovation}%`;
+            }, 500);
+            
+            // Display signals
+            displaySignals(companyData.signals);
+            
+            // Show results section
+            resultsSection.style.display = 'block';
+            
+            // Smooth scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Display extracted signals
+        function displaySignals(signals) {
+            signalsContainer.innerHTML = '';
+            
+            signals.forEach(signal => {
+                const signalCard = document.createElement('div');
+                signalCard.className = `signal-card signal-${signal.type}`;
+                
+                const impactClass = signal.impact.toLowerCase();
+                const impactColor = impactClass === 'high' ? 'var(--violet-accent)' : 
+                                  impactClass === 'medium' ? 'var(--warning-orange)' : 'var(--medium-gray)';
+                
+                signalCard.innerHTML = `
+                    <div class="signal-header">
+                        <span class="signal-category">${signal.category}</span>
+                        <span class="signal-impact" style="color: ${impactColor}">
+                            <i class="fas fa-${getImpactIcon(signal.impact)}"></i> ${signal.impact} Impact
+                        </span>
+                    </div>
+                    <p class="signal-text">${signal.text}</p>
+                `;
+                
+                signalsContainer.appendChild(signalCard);
+            });
+        }
+        
+        // Animate numeric values
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        
+        // Show error message
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        // Helper function to get random icon
+        function getRandomIcon() {
+            const icons = ['building', 'store', 'industry', 'city', 'landmark', 'warehouse'];
+            return icons[Math.floor(Math.random() * icons.length)];
+        }
+        
+        // Helper function to get impact icon
+        function getImpactIcon(impact) {
+            switch(impact.toLowerCase()) {
+                case 'high': return 'arrow-up';
+                case 'medium': return 'minus';
+                case 'low': return 'arrow-down';
+                default: return 'circle';
+            }
+        }
+        
+        // Initialize with sample URL
+        companyUrlInput.value = 'https://techcorp.com';
+        
+        // Note: In a real implementation, you would make an actual API call to Gemini
+        // Here's a sample of what that might look like:
+        /*
+        async function analyzeWithGemini(url) {
+            const prompt = `
+                Analyze the company website at ${url} and extract ICP signals relevant to DT's Ideal Customer Profile.
+                Focus on these categories: Vision, Differentiation, Culture, Process, Innovation.
+                
+                Return a JSON object with this structure:
+                {
+                    "companyName": "extracted name",
+                    "companyDescription": "brief description",
+                    "scores": {
+                        "overall": 0-100,
+                        "vision": 0-100,
+                        "differentiation": 0-100,
+                        "culture": 0-100,
+                        "process": 0-100,
+                        "innovation": 0-100
+                    },
+                    "signals": [
+                        {"category": "Vision", "impact": "High/Medium/Low", "text": "signal text", "type": "positive/negative/neutral"},
+                        ... more signals
+                    ]
+                }
+            `;
+            
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                })
+            });
+            
+            const data = await response.json();
+            // Process the response...
+        }
+        */
+    </script>
+</body>
+</html>
